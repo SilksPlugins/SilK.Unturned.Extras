@@ -3,9 +3,10 @@
 namespace SilK.Unturned.Extras.Events
 {
     /// <summary>
-    /// This event callback interface will generate a true async context for executing the callback method.
+    /// When implemented by a plugin class, the inherited callback method will be executed when the given event is emitted.
+    /// This callback will be executed separate from the game thread, allowing the callback to execute without blocking the game thread.
     /// </summary>
-    /// <typeparam name="TEvent">The event to subscribe to.</typeparam>
+    /// <typeparam name="TEvent">The event to be subscribed to.</typeparam>
     public interface IAsyncExtraEventListener<in TEvent> : IExtraEventListener<TEvent> where TEvent : IEvent
     {
     }
