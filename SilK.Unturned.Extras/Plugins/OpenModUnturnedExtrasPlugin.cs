@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace SilK.Unturned.Extras.Plugins
 {
-    public abstract class OpenModExtraUnturnedPlugin : OpenModUnturnedPlugin
+    public abstract class OpenModUnturnedExtrasPlugin : OpenModUnturnedPlugin
     {
         private readonly Dictionary<Type, MethodInfo> _subscribedMethods;
 
-        protected OpenModExtraUnturnedPlugin(IServiceProvider serviceProvider) : base(serviceProvider)
+        protected OpenModUnturnedExtrasPlugin(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _subscribedMethods = new Dictionary<Type, MethodInfo>();
         }
@@ -23,7 +23,7 @@ namespace SilK.Unturned.Extras.Plugins
         protected sealed override async UniTask OnLoadAsync()
         {
             await OnLoadExtraAsync();
-            
+
             var eventListeners = GetType().GetInterfaces().Where(x =>
                 x.IsGenericType && x.GetGenericTypeDefinition().IsAssignableFrom(typeof(IExtraEventListener<>)));
 
