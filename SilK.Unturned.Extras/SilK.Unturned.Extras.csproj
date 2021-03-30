@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-    <PackageTags>openmod unturned</PackageTags>
+    <PackageTags>openmod openmod-plugin unturned</PackageTags>
     <RootNamespace>SilK.Unturned.Extras</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNugetPackage>true</GenerateNugetPackage>
