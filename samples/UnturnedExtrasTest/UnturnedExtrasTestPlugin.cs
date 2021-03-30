@@ -25,7 +25,7 @@ namespace UnturnedExtrasTest
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _testService = testService;
-            serverHelper.RunWhenServerLoaded(() => logger.LogInformation("Server is loaded"));
+            serverHelper.RunWhenLoaded(() => logger.LogInformation("Server is loaded"));
         }
 
         public UniTask HandleEventAsync(object? sender, UnturnedUserConnectedEvent @event)

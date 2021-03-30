@@ -49,7 +49,7 @@ namespace SilK.Unturned.Extras.Server
             });
         }
 
-        public void RunWhenServerLoaded(Action action)
+        public void RunWhenLoaded(Action action)
         {
             if (Level.isLoaded)
             {
@@ -61,7 +61,7 @@ namespace SilK.Unturned.Extras.Server
             }
         }
 
-        public async Task RunWhenServerLoaded(Func<Task> task)
+        public async Task RunWhenLoaded(Func<Task> task)
         {
             await UniTask.SwitchToMainThread();
 
@@ -75,7 +75,7 @@ namespace SilK.Unturned.Extras.Server
             }
         }
 
-        public UniTask RunWhenServerLoaded(Func<UniTask> task) =>
-            RunWhenServerLoaded(() => task.Invoke().AsTask()).AsUniTask();
+        public UniTask RunWhenLoaded(Func<UniTask> task) =>
+            RunWhenLoaded(() => task.Invoke().AsTask()).AsUniTask();
     }
 }

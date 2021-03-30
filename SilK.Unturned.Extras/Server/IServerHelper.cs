@@ -13,7 +13,7 @@ namespace SilK.Unturned.Extras.Server
         /// If the server is already loaded, the method runs immediately.
         /// </summary>
         /// <param name="action">The given method to be ran.</param>
-        void RunWhenServerLoaded(Action action);
+        void RunWhenLoaded(Action action);
 
         /// <summary>
         /// Runs the given task when the server is loaded.
@@ -21,7 +21,7 @@ namespace SilK.Unturned.Extras.Server
         /// The given task will always run on the main thread.
         /// </summary>
         /// <param name="task">The given task to be ran.</param>
-        Task RunWhenServerLoaded(Func<Task> task);
+        Task RunWhenLoaded(Func<Task> task);
 
         /// <summary>
         /// Runs the given task when the server is loaded.
@@ -29,6 +29,6 @@ namespace SilK.Unturned.Extras.Server
         /// The given task will always run on the main thread.
         /// </summary>
         /// <param name="task">The given task to be ran.</param>
-        UniTask RunWhenServerLoaded(Func<UniTask> task);
+        UniTask RunWhenLoaded(Func<UniTask> task);
     }
 }
