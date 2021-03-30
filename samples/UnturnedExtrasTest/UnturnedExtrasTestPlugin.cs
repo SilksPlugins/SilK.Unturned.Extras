@@ -16,16 +16,22 @@ namespace UnturnedExtrasTest
         IExtraEventListener<UnturnedUserConnectedEvent>,
         IAsyncExtraEventListener<UnturnedPlayerDamagedEvent>
     {
+        private readonly ITestService _testService;
+
         public UnturnedExtrasTestPlugin(
             IServerHelper serverHelper,
+            ITestService testService,
             ILogger<UnturnedExtrasTestPlugin> logger,
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            _testService = testService;
             serverHelper.RunWhenServerLoaded(() => logger.LogInformation("Server is loaded"));
         }
 
         public UniTask HandleEventAsync(object? sender, UnturnedUserConnectedEvent @event)
         {
+            _testService.TestMethod();
+
             Logger.LogInformation($"Player connected - {@event.User.DisplayName}");
 
             return UniTask.CompletedTask;
