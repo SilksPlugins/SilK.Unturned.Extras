@@ -25,7 +25,8 @@ namespace SilK.Unturned.Extras.Plugins
             await OnLoadExtraAsync();
 
             var eventListeners = GetType().GetInterfaces().Where(x =>
-                x.IsGenericType && x.GetGenericTypeDefinition().IsAssignableFrom(typeof(IExtraEventListener<>)));
+                x.IsGenericType && (typeof(IExtraEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition()) ||
+                                    typeof(IAsyncExtraEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition())));
 
             foreach (var listener in eventListeners)
             {
@@ -43,7 +44,8 @@ namespace SilK.Unturned.Extras.Plugins
                 _subscribedMethods.Add(eventType, method);
 
                 EventBus.Subscribe(this, eventType,
-                    (provider, sender, @event) => ProxyHandleEventAsync(provider, sender, @event, eventType));
+                    (_, sender, @event) => ProxyHandleEventAsync(sender, @event, eventType,
+                        typeof(IAsyncExtraEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition())));
             }
         }
 
@@ -64,13 +66,13 @@ namespace SilK.Unturned.Extras.Plugins
             return UniTask.CompletedTask;
         }
 
-        private async Task ProxyHandleEventAsync(IServiceProvider provider, object? sender, IEvent @event, Type eventType)
+        private async Task ProxyHandleEventAsync(object? sender, IEvent @event, Type eventType, bool trueAsync)
         {
             var method = _subscribedMethods[eventType];
 
-            var task = (UniTask) method.Invoke(this, new[] {provider, sender, @event});
+            var task = (UniTask) method.Invoke(this, new[] {sender, @event});
 
-            if (typeof(IAsyncExtraEventListener<>).IsAssignableFrom(eventType))
+            if (trueAsync)
             {
                 task.Forget();
             }

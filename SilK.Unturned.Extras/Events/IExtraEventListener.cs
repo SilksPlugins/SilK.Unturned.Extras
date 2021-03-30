@@ -9,6 +9,6 @@ namespace SilK.Unturned.Extras.Events
     /// <typeparam name="TEvent">The event to be subscribed to.</typeparam>
     public interface IExtraEventListener<in TEvent> where TEvent : IEvent
     {
-        UniTask HandleEventAsync(object sender, TEvent @event);
+        UniTask HandleEventAsync(object? sender, TEvent @event);
     }
 }
