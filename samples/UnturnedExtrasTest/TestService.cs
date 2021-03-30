@@ -1,15 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Cysharp.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using OpenMod.API.Ioc;
+using OpenMod.Unturned.Players.Chat.Events;
 using SilK.Unturned.Extras.Configuration;
+using SilK.Unturned.Extras.Events;
 using SilK.Unturned.Extras.Localization;
 
 namespace UnturnedExtrasTest
 {
-    [ServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
-    public class TestService : ITestService
+    [PluginServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
+    public class TestService : ITestService,
+        IInstanceEventListener<UnturnedPlayerChattingEvent>
     {
         private readonly ILogger<TestService> _logger;
         private readonly IStringLocalizerAccessor<UnturnedExtrasTestPlugin> _stringLocalizerAccessor;
@@ -25,6 +29,13 @@ namespace UnturnedExtrasTest
             _configurationAccessor = configurationAccessor;
 
             TestMethod();
+        }
+
+        public UniTask HandleEventAsync(object? sender, UnturnedPlayerChattingEvent @event)
+        {
+            _logger.LogInformation("Player is chatting: " + @event.Message);
+
+            return UniTask.CompletedTask;
         }
 
         public void TestMethod()

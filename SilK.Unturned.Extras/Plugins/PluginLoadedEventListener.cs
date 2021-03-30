@@ -16,7 +16,8 @@ namespace SilK.Unturned.Extras.Plugins
 
         public Task HandleEventAsync(object? sender, PluginLoadedEvent @event)
         {
-            _eventSubscriber.SubscribeEvents(@event.Plugin, @event.Plugin);
+            _eventSubscriber.Subscribe(@event.Plugin, @event.Plugin);
+            _eventSubscriber.SubscribeServices(@event.Plugin.GetType().Assembly, @event.Plugin);
 
             return Task.CompletedTask;
         }
