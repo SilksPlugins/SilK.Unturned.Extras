@@ -16,6 +16,6 @@ namespace SilK.Unturned.Extras.Events
         /// </summary>
         /// <param name="target">The target class instance to subscribe events to</param>
         /// <param name="component">The component attached to the event subscriptions</param>
-        void SubscribeEvents(object target, IOpenModComponent component);
+        void Subscribe(object target, IOpenModComponent component);
     }
 }
