@@ -29,3 +29,7 @@ jobs:
       run: dotnet nuget push SilK.Unturned.Extras/bin/Release/*.nupkg
              --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
              --source https://api.nuget.org/v3/index.json
+    - name: Push to GitHub
+      run: dotnet nuget push SilK.Unturned.Extras/bin/Release/*.nupkg
+             --api-key ${{ secrets.DEPLOY_KEY }}
+             --source "github"
