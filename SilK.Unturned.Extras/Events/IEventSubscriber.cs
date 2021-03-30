@@ -5,7 +5,7 @@ namespace SilK.Unturned.Extras.Events
 {
     /// <summary>
     /// The event subscriber subscribes events to callback methods within a given class instance
-    /// based on implementations of <see cref="IExtraEventListener{TEvent}"/> and <see cref="IAsyncExtraEventListener{TEvent}"/>.
+    /// based on implementations of <see cref="IInstanceEventListener{TEvent}"/> and <see cref="IInstanceAsyncEventListener{TEvent}"/>.
     /// </summary>
     [Service]
     public interface IEventSubscriber

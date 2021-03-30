@@ -26,8 +26,8 @@ namespace SilK.Unturned.Extras.Events
         public void SubscribeEvents(object target, IOpenModComponent component)
         {
             var eventListeners = target.GetType().GetInterfaces().Where(x =>
-                x.IsGenericType && (typeof(IExtraEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition()) ||
-                                    typeof(IAsyncExtraEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition())));
+                x.IsGenericType && (typeof(IInstanceEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition()) ||
+                                    typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition())));
 
             foreach (var listener in eventListeners)
             {
@@ -46,7 +46,7 @@ namespace SilK.Unturned.Extras.Events
                 {
                     var task = (UniTask) method.Invoke(target, new[] {sender, @event});
 
-                    if (typeof(IAsyncExtraEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
+                    if (typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
                     {
                         task.Forget();
                     }
