@@ -9,17 +9,26 @@ namespace SilK.Unturned.Extras.Server
     public interface IServerHelper
     {
         /// <summary>
-        /// Runs the given task when the server is loaded.
-        /// If the server is already loaded, the task runs immediately.
+        /// Runs the given method when the server is loaded.
+        /// If the server is already loaded, the method runs immediately.
         /// </summary>
-        /// <param name="task">The given task to be ran.</param>
-        void RunWhenServerLoaded(Func<Task> task);
+        /// <param name="action">The given method to be ran.</param>
+        void RunWhenServerLoaded(Action action);
 
         /// <summary>
         /// Runs the given task when the server is loaded.
         /// If the server is already loaded, the task runs immediately.
+        /// The given task will always run on the main thread.
         /// </summary>
         /// <param name="task">The given task to be ran.</param>
-        void RunWhenServerLoaded(Func<UniTask> task);
+        Task RunWhenServerLoaded(Func<Task> task);
+
+        /// <summary>
+        /// Runs the given task when the server is loaded.
+        /// If the server is already loaded, the task runs immediately.
+        /// The given task will always run on the main thread.
+        /// </summary>
+        /// <param name="task">The given task to be ran.</param>
+        UniTask RunWhenServerLoaded(Func<UniTask> task);
     }
 }
