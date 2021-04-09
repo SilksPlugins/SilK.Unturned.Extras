@@ -1,6 +1,7 @@
-﻿using System.Reflection;
-using OpenMod.API;
+﻿using OpenMod.API;
 using OpenMod.API.Ioc;
+using System;
+using System.Reflection;
 
 namespace SilK.Unturned.Extras.Events
 {
@@ -17,7 +18,8 @@ namespace SilK.Unturned.Extras.Events
         /// </summary>
         /// <param name="target">The target class instance to subscribe events to</param>
         /// <param name="component">The component attached to the event subscriptions.</param>
-        void Subscribe(object target, IOpenModComponent component);
+        /// <returns>A disposable that unsubscribes the callback when disposed.</returns>
+        IDisposable Subscribe(object target, IOpenModComponent component);
 
         /// <summary>
         /// Subscribe events to callback methods within singleton
@@ -25,6 +27,7 @@ namespace SilK.Unturned.Extras.Events
         /// </summary>
         /// <param name="assembly">The assembly to search for singleton services within.</param>
         /// <param name="component">The component attached to the event subscriptions.</param>
-        void SubscribeServices(Assembly assembly, IOpenModComponent component);
+        /// <returns>A disposable that unsubscribes the callback when disposed.</returns>
+        IDisposable SubscribeServices(Assembly assembly, IOpenModComponent component);
     }
 }

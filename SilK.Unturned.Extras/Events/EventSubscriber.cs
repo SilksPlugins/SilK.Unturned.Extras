@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using OpenMod.Core.Helpers;
 
 namespace SilK.Unturned.Extras.Events
 {
@@ -38,9 +39,11 @@ namespace SilK.Unturned.Extras.Events
             x.IsGenericType && (typeof(IInstanceEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition()) ||
                                 typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(x.GetGenericTypeDefinition())));
 
-        public void Subscribe(object target, IOpenModComponent component)
+        public IDisposable Subscribe(object target, IOpenModComponent component)
         {
             var eventListeners = GetEventListenerTypes(target.GetType());
+
+            var disposables = new List<IDisposable>();
 
             foreach (var listener in eventListeners)
             {
@@ -55,7 +58,7 @@ namespace SilK.Unturned.Extras.Events
                     continue;
                 }
 
-                _eventBus.Subscribe(component, eventType, async (_, sender, @event) =>
+                var disposable = _eventBus.Subscribe(component, eventType, async (_, sender, @event) =>
                 {
                     var task = (UniTask) method.Invoke(target, new[] {sender, @event});
 
@@ -68,7 +71,11 @@ namespace SilK.Unturned.Extras.Events
                         await task.AsTask();
                     }
                 });
+
+                disposables.Add(disposable);
             }
+
+            return new DisposeAction(disposables.DisposeAll);
         }
 
         // todo: Use ServiceRegistrationHelper.FindFromAssembly in next patch
@@ -138,8 +145,10 @@ namespace SilK.Unturned.Extras.Events
             }
         }
 
-        public void SubscribeServices(Assembly assembly, IOpenModComponent component)
+        public IDisposable SubscribeServices(Assembly assembly, IOpenModComponent component)
         {
+            var disposables = new List<IDisposable>();
+
             var registrations =
                 FindFromAssembly<ServiceImplementationAttribute>(assembly)
                     .Where(x => x.Lifetime == ServiceLifetime.Singleton).ToList();
@@ -160,9 +169,13 @@ namespace SilK.Unturned.Extras.Events
 
                     // Service is singleton, exists, has event listeners, and is same as implementation
 
-                    Subscribe(service, component);
+                    var disposable = Subscribe(service, component);
+
+                    disposables.Add(disposable);
                 }
             }
+
+            return new DisposeAction(disposables.DisposeAll);
         }
     }
 }
