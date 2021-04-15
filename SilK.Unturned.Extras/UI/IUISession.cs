@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using OpenMod.Unturned.Users;
+using System;
 
 namespace SilK.Unturned.Extras.UI
 {
@@ -27,5 +28,10 @@ namespace SilK.Unturned.Extras.UI
         /// Called once per session.
         /// </summary>
         UniTask EndAsync();
+
+        /// <summary>
+        /// An event which should be invoked when the UI session has finished ending;
+        /// </summary>
+        event Action<IUISession> OnUISessionEnded;
     }
 }
