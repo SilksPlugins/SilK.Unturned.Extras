@@ -1,39 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-    <PackageTags>openmod openmod-plugin unturned</PackageTags>
-    <RepositoryUrl>https://github.com/IAmSilK/SilK.Unturned.Extras</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <RootNamespace>SilK.Unturned.Extras</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <GenerateNugetPackage>true</GenerateNugetPackage>
-    <Product>SilK.Unturned.Extras</Product>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>nullable</WarningsAsErrors>
-    <NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
-    <LangVersion>9.0</LangVersion>
-    <Version>0.0.0</Version>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net461</TargetFramework>
+		<AssemblyName>SilK.Unturned.Extras</AssemblyName>
+		<Product>$(AssemblyName)</Product>
+		<RootNamespace>$(AssemblyName)</RootNamespace>
+		<Version>0.0.0</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenMod.Unturned" Version="3.0.24" />
-    <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<PropertyGroup>
+		<PackageId>SilK.Unturned.Extras</PackageId>
+		<PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
+		<PackageTags>openmod openmod-plugin unturned</PackageTags>
+		<Description>An OpenMod plugin for Unturned which adds extra functionality for developers.</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateNugetPackage>true</GenerateNugetPackage>
+		<Authors>Stephen White</Authors>
+		<Company>SilK's Plugins</Company>
+	</PropertyGroup>
 
-  <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-      <ReferencePath Condition="'%(FileName)' == 'JetBrains.Annotations'">
-        <Aliases>JetBrainsAnnotations</Aliases>
-      </ReferencePath>
-    </ItemGroup>
-  </Target>
+	<PropertyGroup>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/IAmSilK/SilK.Unturned.Extras</RepositoryUrl>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
+		<LangVersion>9.0</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenMod.Unturned" Version="3.0.24" />
+		<PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
+			<PrivateAssets>All</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+		<ItemGroup>
+			<ReferencePath Condition="'%(FileName)' == 'JetBrains.Annotations'">
+				<Aliases>JetBrainsAnnotations</Aliases>
+			</ReferencePath>
+		</ItemGroup>
+	</Target>
 
 </Project>
