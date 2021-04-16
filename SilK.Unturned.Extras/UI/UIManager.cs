@@ -105,6 +105,8 @@ namespace SilK.Unturned.Extras.UI
 
             session.OnUISessionEnded += (s) => OnUISessionEnded(sessions, s);
 
+            await session.StartAsync();
+
             return session;
         }
 
