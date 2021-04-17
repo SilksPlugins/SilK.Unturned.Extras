@@ -14,7 +14,8 @@ namespace SilK.Unturned.Extras.Steam
         /// Gets the steam profile data for a player.
         /// </summary>
         /// <param name="steamId">The steam id of the player.</param>
+        /// <param name="forceRefresh">Force a refresh of the cache.</param>
         /// <returns>The steam profile data for the player.</returns>
-        Task<ISteamProfile?> GetSteamProfile(CSteamID steamId);
+        Task<ISteamProfile?> GetSteamProfile(CSteamID steamId, bool forceRefresh = false);
     }
 }

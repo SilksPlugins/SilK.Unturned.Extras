@@ -33,9 +33,9 @@ namespace SilK.Unturned.Extras.Steam
 
         private static string GetProfileDataUrl(CSteamID steamId) => $"https://steamcommunity.com/profiles/{steamId}?xml=1";
 
-        public async Task<ISteamProfile?> GetSteamProfile(CSteamID steamId)
+        public async Task<ISteamProfile?> GetSteamProfile(CSteamID steamId, bool forceRefresh = false)
         {
-            if (_cachedProfiles.TryGetValue(steamId, out var profile))
+            if (!forceRefresh && _cachedProfiles.TryGetValue(steamId, out var profile))
                 return profile;
 
             var url = GetProfileDataUrl(steamId);
@@ -50,6 +50,8 @@ namespace SilK.Unturned.Extras.Steam
 
                 if (!_cachedProfiles.ContainsKey(steamId))
                     _cachedProfiles.Add(steamId, profile);
+                else
+                    _cachedProfiles[steamId] = profile;
 
                 return profile;
             }
