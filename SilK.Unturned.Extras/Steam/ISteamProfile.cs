@@ -1,5 +1,8 @@
 ﻿namespace SilK.Unturned.Extras.Steam
 {
+    /// <summary>
+    /// The profile data for a player's steam account.
+    /// </summary>
     public interface ISteamProfile
     {
         ulong SteamId { get; }
