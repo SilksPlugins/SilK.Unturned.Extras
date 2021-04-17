@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 
 namespace SilK.Unturned.Extras.Steam
 {
-    [PluginServiceImplementation(Lifetime = ServiceLifetime.Transient)]
+    [ServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
     internal class SteamProfileFetcher : ISteamProfileFetcher, IDisposable
     {
         private readonly ILogger<SteamProfileFetcher> _logger;
