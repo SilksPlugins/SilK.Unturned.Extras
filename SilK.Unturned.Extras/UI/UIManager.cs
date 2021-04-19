@@ -14,11 +14,12 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SilK.Unturned.Extras.UI
 {
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
-    internal class UIManager : IUIManager,
+    internal class UIManager : IUIManager, IAsyncDisposable,
         IInstanceEventListener<UnturnedUserDisconnectedEvent>,
         IInstanceAsyncEventListener<UnturnedPlayerDeathEvent>
     {
@@ -59,6 +60,34 @@ namespace SilK.Unturned.Extras.UI
             _logger = logger;
 
             _uiSessions = new Dictionary<CSteamID, UISessions>();
+            _enabledCursorIds = new HashSet<string>();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            List<IUISession> sessions;
+
+            lock (_uiSessions)
+            {
+                sessions = _uiSessions.Values.SelectMany(uiSessions => uiSessions.Sessions)
+                    .Select(session => session.Session).ToList();
+
+                _uiSessions.Clear();
+            }
+
+            foreach (var session in sessions)
+            {
+                try
+                {
+                    await session.EndAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred when disposing UI session");
+                }
+            }
+
+            _enabledCursorIds.Clear();
         }
 
         private UISessions GetUISessions(UnturnedUser user)
