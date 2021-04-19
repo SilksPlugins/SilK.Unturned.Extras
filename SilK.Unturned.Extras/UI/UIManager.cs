@@ -8,6 +8,7 @@ using OpenMod.Core.Ioc;
 using OpenMod.Unturned.Players.Life.Events;
 using OpenMod.Unturned.Users;
 using OpenMod.Unturned.Users.Events;
+using SDG.Unturned;
 using SilK.Unturned.Extras.Events;
 using Steamworks;
 using System;
@@ -47,6 +48,7 @@ namespace SilK.Unturned.Extras.UI
         private readonly ILogger<UIManager> _logger;
 
         private readonly Dictionary<CSteamID, UISessions> _uiSessions;
+        private readonly HashSet<string> _enabledCursorIds;
 
         public UIManager(ILifetimeScope lifetimeScope,
             IUnturnedUserDirectory userDirectory,
@@ -225,6 +227,33 @@ namespace SilK.Unturned.Extras.UI
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error occurred when ending UI session");
+                }
+            }
+        }
+
+        public async UniTask<bool> IsCursorEnabled(UnturnedUser user)
+        {
+            await UniTask.SwitchToMainThread();
+
+            return user.Player.Player.isPluginWidgetFlagActive(EPluginWidgetFlags.Modal);
+        }
+
+        public async UniTask SetCursor(UnturnedUser user, string id, bool enabled)
+        {
+            await UniTask.SwitchToMainThread();
+
+            if (enabled)
+            {
+                _enabledCursorIds.Add(id);
+                user.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal, true);
+            }
+            else
+            {
+                _enabledCursorIds.Remove(id);
+
+                if (_enabledCursorIds.Count == 0)
+                {
+                    user.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal, false);
                 }
             }
         }

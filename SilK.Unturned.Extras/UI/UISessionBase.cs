@@ -29,6 +29,7 @@ namespace SilK.Unturned.Extras.UI
 
         protected ITransportConnection TransportConnection => User.Player.SteamPlayer.transportConnection;
 
+        protected readonly IUIManager UIManager;
         protected readonly IUIKeyAllocator KeyAllocator;
 
         private readonly List<(object, ButtonClickedCallback)> _buttonClickedCallbacks;
@@ -46,6 +47,7 @@ namespace SilK.Unturned.Extras.UI
         {
             User = user;
 
+            UIManager = serviceProvider.GetRequiredService<IUIManager>();
             KeyAllocator = serviceProvider.GetRequiredService<IUIKeyAllocator>();
 
             _cancellationTokenSource = new CancellationTokenSource();
@@ -149,6 +151,10 @@ namespace SilK.Unturned.Extras.UI
         {
             EffectManager.askEffectClearByID(id, TransportConnection);
         }
+
+        protected UniTask<bool> IsCursorEnabled() => UIManager.IsCursorEnabled(User);
+
+        protected UniTask SetCursor(bool enabled) => UIManager.SetCursor(User, Id, enabled);
 
         protected delegate UniTask ButtonClickedCallback(string buttonName);
 

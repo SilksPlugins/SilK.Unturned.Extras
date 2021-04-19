@@ -61,5 +61,22 @@ namespace SilK.Unturned.Extras.UI
         /// <returns>The retrieved/created UI session.</returns>
         UniTask<TSession> GetOrStartSession<TSession>(UnturnedUser user, UISessionOptions? options = null,
             ILifetimeScope? lifetimeScope = null) where TSession : class, IUISession;
+
+        /// <summary>
+        /// Checks if the user's cursor is enabled.
+        /// </summary>
+        /// <param name="user">The user who's cursor is being checked.</param>
+        /// <returns><c>True</c> if the cursor is enabled; <c>false</c> otherwise.</returns>
+        UniTask<bool> IsCursorEnabled(UnturnedUser user);
+
+        /// <summary>
+        /// Enables/disables the cursor associated with the given id.
+        /// If the cursor is enabled, the player's cursor
+        /// will not be disabled until it is disabled for the given id.
+        /// </summary>
+        /// <param name="user">The user to enable the cursor for.</param>
+        /// <param name="id">The id related to the cursor's enablement.</param>
+        /// <param name="enabled">Whether or not the cursor is being enabled.</param>
+        UniTask SetCursor(UnturnedUser user, string id, bool enabled);
     }
 }
