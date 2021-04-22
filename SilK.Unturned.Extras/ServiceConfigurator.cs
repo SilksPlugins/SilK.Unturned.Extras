@@ -11,6 +11,8 @@ namespace SilK.Unturned.Extras
         {
             serviceCollection.AddTransient(typeof(IConfigurationAccessor<>), typeof(ConfigurationAccessor<>));
             serviceCollection.AddTransient(typeof(IStringLocalizerAccessor<>), typeof(StringLocalizerAccessor<>));
+
+            serviceCollection.AddTransient(typeof(IConfigurationParser<>), typeof(ConfigurationParser<>));
         }
     }
 }
