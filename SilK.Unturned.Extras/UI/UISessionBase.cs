@@ -82,6 +82,9 @@ namespace SilK.Unturned.Extras.UI
 
             await _eventsDisposable.DisposeAllAsync();
 
+            lock(_buttonClickedCallbacks) _buttonClickedCallbacks.Clear();
+            lock (_textInputtedCallbacks) _textInputtedCallbacks.Clear();
+
             _cancellationTokenSource.Cancel();
 
             await OnEndAsync();
