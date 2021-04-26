@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using OpenMod.API.Ioc;
 using OpenMod.API.Plugins;
 using SilK.Unturned.Extras.Plugins;
 
@@ -11,7 +10,6 @@ namespace SilK.Unturned.Extras.Configuration
     /// <typeparam name="TPlugin">The plugin of the target configuration.</typeparam>
     public interface IConfigurationAccessor<out TPlugin> where TPlugin : IOpenModPlugin
     {
-
         /// <summary>
         /// Gets the configuration instance.
         /// </summary>

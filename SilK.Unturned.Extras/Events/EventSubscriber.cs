@@ -7,12 +7,12 @@ using OpenMod.API.Eventing;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
 using OpenMod.Common.Helpers;
+using OpenMod.Core.Helpers;
 using OpenMod.Core.Ioc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using OpenMod.Core.Helpers;
 
 namespace SilK.Unturned.Extras.Events
 {

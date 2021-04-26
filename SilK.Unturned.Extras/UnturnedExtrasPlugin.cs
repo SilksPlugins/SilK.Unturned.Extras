@@ -1,6 +1,6 @@
-﻿using OpenMod.Unturned.Plugins;
+﻿using OpenMod.API.Plugins;
+using OpenMod.Unturned.Plugins;
 using System;
-using OpenMod.API.Plugins;
 
 [assembly: PluginMetadata("SilK.Unturned.Extras", DisplayName = "SilK's Unturned Extras",
     Author = "SilK", Website = "https://github.com/IAmSilK/SilK.Unturned.Extras/")]

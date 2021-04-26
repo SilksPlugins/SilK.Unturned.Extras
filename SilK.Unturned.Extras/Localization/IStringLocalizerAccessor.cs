@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Localization;
-using OpenMod.API.Ioc;
 using OpenMod.API.Plugins;
 using SilK.Unturned.Extras.Plugins;
 
@@ -11,7 +10,6 @@ namespace SilK.Unturned.Extras.Localization
     /// <typeparam name="TPlugin">The plugin of the target string localizer.</typeparam>
     public interface IStringLocalizerAccessor<out TPlugin> where TPlugin : IOpenModPlugin
     {
-
         /// <summary>
         /// Gets the string localizer instance.
         /// </summary>
