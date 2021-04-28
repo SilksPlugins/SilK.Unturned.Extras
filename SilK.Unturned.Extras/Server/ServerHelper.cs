@@ -13,7 +13,7 @@ using Action = System.Action;
 namespace SilK.Unturned.Extras.Server
 {
     [UsedImplicitly]
-    [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
+    [ServiceImplementation(Lifetime = ServiceLifetime.Scoped, Priority = Priority.Lowest)]
     internal class ServerHelper : IServerHelper, IDisposable
     {
         private readonly List<Action> _syncActions;
