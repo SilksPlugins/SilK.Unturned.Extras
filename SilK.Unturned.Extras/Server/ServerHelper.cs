@@ -31,10 +31,15 @@ namespace SilK.Unturned.Extras.Server
         {
             // ReSharper disable once DelegateSubtraction
             Level.onPostLevelLoaded -= OnPostLevelLoaded;
+
+            _syncActions.Clear();
+            _tasks.Clear();
         }
 
         private void OnPostLevelLoaded(int level)
         {
+            if (level != Level.BUILD_INDEX_GAME) return;
+
             AsyncHelper.RunSync(async () =>
             {
                 foreach (var action in _syncActions)
@@ -42,10 +47,14 @@ namespace SilK.Unturned.Extras.Server
                     action.Invoke();
                 }
 
+                _syncActions.Clear();
+
                 foreach (var task in _tasks)
                 {
                     await task.Invoke();
                 }
+
+                _tasks.Clear();
             });
         }
 
