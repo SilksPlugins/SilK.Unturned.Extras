@@ -54,7 +54,7 @@ namespace SilK.Unturned.Extras.UI
 
             _buttonClickedCallbacks = new List<(object, ButtonClickedCallback)>();
             _textInputtedCallbacks = new List<(object, TextInputtedCallback)>();
-
+            
             var eventBus = serviceProvider.GetRequiredService<IEventBus>();
             var component = serviceProvider.GetRequiredService<IOpenModComponent>();
 

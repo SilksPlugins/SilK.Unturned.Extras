@@ -1,9 +1,9 @@
 ﻿using Autofac;
 using Cysharp.Threading.Tasks;
+using HarmonyLib;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenMod.API.Ioc;
-using OpenMod.API.Prioritization;
 using OpenMod.Core.Ioc;
 using OpenMod.Unturned.Players.Life.Events;
 using OpenMod.Unturned.Users;
@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Priority = OpenMod.API.Prioritization.Priority;
 
 namespace SilK.Unturned.Extras.UI
 {
@@ -61,10 +62,14 @@ namespace SilK.Unturned.Extras.UI
 
             _uiSessions = new Dictionary<CSteamID, UISessions>();
             _enabledCursorIds = new HashSet<string>();
+
+            OnArenaClear += Events_OnArenaClear;
         }
 
         public async ValueTask DisposeAsync()
         {
+            OnArenaClear -= Events_OnArenaClear;
+
             List<IUISession> sessions;
 
             lock (_uiSessions)
@@ -284,6 +289,52 @@ namespace SilK.Unturned.Extras.UI
                 {
                     user.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal, false);
                 }
+            }
+        }
+
+        private void Events_OnArenaClear()
+        {
+            async UniTask ArenaClearTask()
+            {
+                var sessionsToEnd = new List<IUISession>();
+
+                lock (_uiSessions)
+                {
+                    foreach (var uiSessions in _uiSessions.Values)
+                    {
+                        var sessions = uiSessions.Sessions.Where(x => x.Options != null && x.Options.EndOnArenaClear);
+
+                        sessionsToEnd.AddRange(sessions.Select(x => x.Session));
+                    }
+                }
+
+                foreach (var session in sessionsToEnd)
+                {
+                    try
+                    {
+                        await session.EndAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred when ending UI session");
+                    }
+                }
+            }
+
+            ArenaClearTask().Forget();
+        }
+
+        private delegate void ArenaClear();
+        private static event ArenaClear? OnArenaClear;
+
+        [HarmonyPatch]
+        private static class UnturnedPatches
+        {
+            [HarmonyPatch(typeof(LevelManager), "arenaClear")]
+            [HarmonyPrefix]
+            private static void ArenaClear()
+            {
+                OnArenaClear?.Invoke();
             }
         }
     }
