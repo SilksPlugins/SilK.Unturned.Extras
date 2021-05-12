@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace SilK.Unturned.Extras.Dispatcher
 {
     [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
-    public class ActionDispatcher : IActionDispatcher, IDisposable
+    internal class ActionDispatcher : IActionDispatcher, IDisposable
     {
         private readonly ILogger<ActionDispatcher> _logger;
         private readonly ConcurrentQueue<Action> _queueActions = new();
