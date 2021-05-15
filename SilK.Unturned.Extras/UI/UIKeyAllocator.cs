@@ -1,52 +1,36 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using OpenMod.API;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
-using System.Collections.Generic;
+using OpenMod.Unturned.Effects;
 
 namespace SilK.Unturned.Extras.UI
 {
+    [Obsolete]
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     internal class UIKeyAllocator : IUIKeyAllocator
     {
-        private readonly Dictionary<string, short> _stringIdAllocations;
-        private readonly Dictionary<ushort, short> _idAllocations;
+        private readonly IUnturnedUIEffectsKeysProvider _keysProvider;
+        private readonly IRuntime _runtime;
 
-        private short _nextKey;
-
-
-        public UIKeyAllocator()
+        public UIKeyAllocator(
+            IUnturnedUIEffectsKeysProvider keysProvider,
+            IRuntime runtime)
         {
-            _stringIdAllocations = new Dictionary<string, short>();
-            _idAllocations = new Dictionary<ushort, short>();
-
-            _nextKey = -20000;
+            _keysProvider = keysProvider;
+            _runtime = runtime;
         }
 
         public short GetEffectKey()
         {
-            return _nextKey++;
+            var key = _keysProvider.BindKey(_runtime);
+
+            return key.Value;
         }
 
-        public short GetEffectKey(string id)
-        {
-            if (_stringIdAllocations.TryGetValue(id, out var key))
-                return key;
+        public short GetEffectKey(string id) => GetEffectKey();
 
-            key = GetEffectKey();
-            _stringIdAllocations.Add(id, key);
-
-            return key;
-        }
-
-        public short GetEffectKey(ushort id)
-        {
-            if (_idAllocations.TryGetValue(id, out var key))
-                return key;
-
-            key = GetEffectKey();
-            _idAllocations.Add(id, key);
-
-            return key;
-        }
+        public short GetEffectKey(ushort id) => GetEffectKey();
     }
 }
