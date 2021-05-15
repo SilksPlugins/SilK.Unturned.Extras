@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace SilK.Unturned.Extras.Dispatcher
 {
+    /// <summary>
+    /// Executes given actions/tasks in the order they are queued.
+    /// Credits to Rube200 on the OpenMod.Economy project,
+    /// where this code is from: https://github.com/Rube200
+    /// </summary>
     [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
     internal class ActionDispatcher : IActionDispatcher, IDisposable
     {
