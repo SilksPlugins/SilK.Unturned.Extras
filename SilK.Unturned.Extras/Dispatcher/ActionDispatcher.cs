@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
+using OpenMod.Core.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -120,7 +121,7 @@ namespace SilK.Unturned.Extras.Dispatcher
             return tcs.Task;
         }
 
-        public Task Enqueue(Func<Task> task, Action<Exception>? exceptionHandler = null)
+        public async Task Enqueue(Func<Task> task, Action<Exception>? exceptionHandler = null)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
@@ -128,12 +129,14 @@ namespace SilK.Unturned.Extras.Dispatcher
             if (!LoadDispatcher())
                 throw new ObjectDisposedException(nameof(ActionDispatcher));
 
-            var tcs = new TaskCompletionSource<Task>();
+            var tcs = new TaskCompletionSource<bool>();
             _queueActions.Enqueue(() =>
             {
                 try
                 {
-                    tcs.SetResult(task());
+                    AsyncHelper.RunSync(task);
+
+                    tcs.SetResult(true);
                 }
                 catch (Exception ex)
                 {
@@ -146,7 +149,7 @@ namespace SilK.Unturned.Extras.Dispatcher
                 }
             });
             _waitHandle.Set();
-            return tcs.Task;
+            await tcs.Task;
         }
 
         public Task<T> Enqueue<T>(Func<T> action, Action<Exception>? exceptionHandler = null)
@@ -178,7 +181,7 @@ namespace SilK.Unturned.Extras.Dispatcher
             return tcs.Task;
         }
 
-        public Task<T> Enqueue<T>(Func<Task<T>> task, Action<Exception>? exceptionHandler = null)
+        public async Task<T> Enqueue<T>(Func<Task<T>> task, Action<Exception>? exceptionHandler = null)
         {
             if (task is null)
                 throw new ArgumentNullException(nameof(task));
@@ -187,11 +190,13 @@ namespace SilK.Unturned.Extras.Dispatcher
                 throw new ObjectDisposedException(nameof(ActionDispatcher));
 
             var tcs = new TaskCompletionSource<T>();
-            _queueActions.Enqueue(async () =>
+            _queueActions.Enqueue(() =>
             {
                 try
                 {
-                    tcs.SetResult(await task());
+                    var result = AsyncHelper.RunSync(task);
+
+                    tcs.SetResult(result);
                 }
                 catch (Exception ex)
                 {
@@ -204,7 +209,7 @@ namespace SilK.Unturned.Extras.Dispatcher
                 }
             });
             _waitHandle.Set();
-            return tcs.Task;
+            return await tcs.Task;
         }
 
         #endregion
