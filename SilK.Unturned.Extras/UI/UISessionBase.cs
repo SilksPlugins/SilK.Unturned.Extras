@@ -96,6 +96,8 @@ namespace SilK.Unturned.Extras.UI
 
             _cancellationTokenSource.Cancel();
 
+            await SetCursor(false);
+
             await OnEndAsync();
 
             OnUISessionEnded?.Invoke(this);
