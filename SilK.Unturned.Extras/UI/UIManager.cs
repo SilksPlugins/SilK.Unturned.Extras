@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenMod.Unturned.Server.Events;
 using Priority = OpenMod.API.Prioritization.Priority;
 
 namespace SilK.Unturned.Extras.UI
@@ -22,7 +23,8 @@ namespace SilK.Unturned.Extras.UI
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     internal class UIManager : IUIManager, IAsyncDisposable,
         IInstanceEventListener<UnturnedUserDisconnectedEvent>,
-        IInstanceAsyncEventListener<UnturnedPlayerDeathEvent>
+        IInstanceAsyncEventListener<UnturnedPlayerDeathEvent>,
+        IInstanceAsyncEventListener<UnturnedShutdownCommencedEvent>
     {
         public class UISessions
         {
@@ -52,6 +54,8 @@ namespace SilK.Unturned.Extras.UI
         private readonly Dictionary<CSteamID, UISessions> _uiSessions;
         private readonly HashSet<string> _enabledCursorIds;
 
+        private bool _isDisposed;
+
         public UIManager(ILifetimeScope lifetimeScope,
             IUnturnedUserDirectory userDirectory,
             ILogger<UIManager> logger)
@@ -68,6 +72,9 @@ namespace SilK.Unturned.Extras.UI
 
         public async ValueTask DisposeAsync()
         {
+            if (_isDisposed) return;
+            _isDisposed = true;
+
             OnArenaClear -= Events_OnArenaClear;
 
             List<IUISession> sessions;
@@ -93,6 +100,11 @@ namespace SilK.Unturned.Extras.UI
             }
 
             _enabledCursorIds.Clear();
+        }
+
+        public async UniTask HandleEventAsync(object? sender, UnturnedShutdownCommencedEvent @event)
+        {
+            await DisposeAsync();
         }
 
         private UISessions GetUISessions(UnturnedUser user)
