@@ -1,4 +1,5 @@
-﻿using OpenMod.Unturned.Users;
+﻿using OpenMod.Unturned.Effects;
+using OpenMod.Unturned.Users;
 using System;
 
 namespace SilK.Unturned.Extras.UI
@@ -7,12 +8,23 @@ namespace SilK.Unturned.Extras.UI
     {
         public abstract ushort EffectId { get; }
 
-        private short? _effectKey;
-        protected short EffectKey => _effectKey ??= KeyAllocator.GetEffectKey(EffectId);
+        private UnturnedUIEffectKey? _effectKey;
+        protected short EffectKey => (_effectKey ??= KeysProvider.BindKey(OpenModComponent)).Value;
 
         protected SingleEffectUISession(UnturnedUser user, IServiceProvider serviceProvider)
             : base(user, serviceProvider)
         {
+            Dispose += OnDispose;
+        }
+
+        private void OnDispose()
+        {
+            Dispose -= OnDispose;
+
+            if (_effectKey != null)
+            {
+                KeysProvider.ReleaseKey(OpenModComponent, _effectKey.Value);
+            }
         }
 
         protected void SendUIEffect() =>
