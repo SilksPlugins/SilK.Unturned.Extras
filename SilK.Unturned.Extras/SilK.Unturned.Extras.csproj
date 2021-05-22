@@ -15,6 +15,7 @@
 		<Description>An OpenMod plugin for Unturned which adds extra functionality for developers.</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<GenerateNugetPackage>true</GenerateNugetPackage>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Authors>Stephen White</Authors>
 		<Company>SilK's Plugins</Company>
 	</PropertyGroup>
