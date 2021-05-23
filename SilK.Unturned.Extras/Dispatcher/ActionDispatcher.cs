@@ -14,7 +14,7 @@ namespace SilK.Unturned.Extras.Dispatcher
     /// <summary>
     /// Executes given actions/tasks in the order they are queued.
     /// </summary>
-    [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Highest)]
+    [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
     internal class ActionDispatcher : IActionDispatcher, IAsyncDisposable
     {
         private readonly ILogger<ActionDispatcher> _logger;
