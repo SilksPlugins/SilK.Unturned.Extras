@@ -19,25 +19,53 @@ using Action = System.Action;
 
 namespace SilK.Unturned.Extras.UI
 {
+    /// <summary>
+    /// An implementation of <see cref="IUISession"/> which
+    /// provides basic functionality for UI sessions to use.
+    /// </summary>
     public abstract class UISessionBase : IUISession, IAsyncDisposable
     {
+        /// <inheritdoc cref="IUISession.Id"/>
         public abstract string Id { get; }
 
+        /// <summary>
+        /// The user this UI session pertains to.
+        /// </summary>
         public UnturnedUser User { get; }
 
+        /// <summary>
+        /// The cancellation token used to cancel tasks when the session is ended.
+        /// </summary>
         public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
+        /// <inheritdoc cref="IUISession.OnUISessionEnded"/>
         public event Action<IUISession>? OnUISessionEnded;
 
+        /// <summary>
+        /// The transport connection of the User used
+        /// with <see cref="EffectManager"/> to transmit UI information.
+        /// </summary>
         protected ITransportConnection TransportConnection => User.Player.SteamPlayer.transportConnection;
 
+        /// <summary>
+        /// The <see cref="IUIManager"/> service.
+        /// </summary>
         protected readonly IUIManager UIManager;
 
+        /// <summary>
+        /// The <b>obsolete</b> <see cref="IUIKeyAllocator"/> service. This property will be removed in v2.0.
+        /// </summary>
         [Obsolete("Use KeysProvider instead. This will be removed in v2.0.")]
         protected readonly IUIKeyAllocator KeyAllocator;
 
+        /// <summary>
+        /// The <see cref="IUnturnedUIEffectsKeysProvider"/> service.
+        /// </summary>
         protected readonly IUnturnedUIEffectsKeysProvider KeysProvider;
 
+        /// <summary>
+        /// The <see cref="IOpenModComponent"/> resolved by the provided lifetime scope.
+        /// </summary>
         protected readonly IOpenModComponent OpenModComponent;
 
         private readonly List<(object, ButtonClickedCallback)> _buttonClickedCallbacks;
@@ -49,6 +77,11 @@ namespace SilK.Unturned.Extras.UI
         private bool _isEnded;
         private bool _isDisposed;
 
+        /// <summary>
+        /// Creates an instance of <see cref="UISessionBase"/>.
+        /// </summary>
+        /// <param name="user">The user this UI session pertains to.</param>
+        /// <param name="serviceProvider">The provider used to resolve services.</param>
         protected UISessionBase(
             UnturnedUser user,
             IServiceProvider serviceProvider)
@@ -77,13 +110,19 @@ namespace SilK.Unturned.Extras.UI
             };
         }
 
+        /// <inheritdoc cref="IUISession.StartAsync"/>
         public async UniTask StartAsync()
         {
             await OnStartAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         protected virtual UniTask OnStartAsync() => UniTask.CompletedTask;
 
+        /// <inheritdoc cref="IUISession.EndAsync"/>
         public async UniTask EndAsync()
         {
             if (_isEnded) return;

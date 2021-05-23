@@ -4,11 +4,22 @@ using System;
 
 namespace SilK.Unturned.Extras.UI
 {
+    /// <summary>
+    /// An implementation of <see cref="UISessionBase"/> which
+    /// provides wrapper methods to support a UI with only one effect.
+    /// </summary>
     public abstract class SingleEffectUISession : UISessionBase
     {
+        /// <summary>
+        /// The single effect ID to be used by wrapper methods.
+        /// </summary>
         public abstract ushort EffectId { get; }
 
         private UnturnedUIEffectKey? _effectKey;
+
+        /// <summary>
+        /// The effect key used alongside the provided <see cref="EffectId"/>.
+        /// </summary>
         protected short EffectKey => (_effectKey ??= KeysProvider.BindKey(OpenModComponent)).Value;
 
         protected SingleEffectUISession(UnturnedUser user, IServiceProvider serviceProvider)

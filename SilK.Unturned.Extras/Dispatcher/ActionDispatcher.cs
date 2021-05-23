@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Nito.AsyncEx;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Helpers;
@@ -12,194 +13,127 @@ namespace SilK.Unturned.Extras.Dispatcher
 {
     /// <summary>
     /// Executes given actions/tasks in the order they are queued.
-    /// Credits to Rube200 on the OpenMod.Economy project,
-    /// where this code is from: https://github.com/Rube200
     /// </summary>
-    [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
-    internal class ActionDispatcher : IActionDispatcher, IDisposable
+    [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Highest)]
+    internal class ActionDispatcher : IActionDispatcher, IAsyncDisposable
     {
         private readonly ILogger<ActionDispatcher> _logger;
-        private readonly ConcurrentQueue<Action> _queueActions = new();
-        private readonly AutoResetEvent _waitHandle = new(false);
+        private readonly ConcurrentQueue<Func<Task>> _queuedTasks = new();
 
         private bool _disposed;
-        private Thread? _loopThread;
+        private AsyncAutoResetEvent? _disposeWaitHandle;
+
+        private readonly AsyncLock _mutex = new();
+        private bool _processingQueue;
 
         public ActionDispatcher(ILogger<ActionDispatcher> logger)
         {
             _logger = logger;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            lock (this)
+            using (await _mutex.LockAsync())
             {
                 if (_disposed)
                     return;
 
                 _disposed = true;
+
+                if (_queuedTasks.IsEmpty) return;
+
+                _disposeWaitHandle = new AsyncAutoResetEvent();
             }
 
-            _waitHandle.Set();
-
-            _loopThread?.Join();
-            _loopThread = null;
-
-            _waitHandle.Dispose();
+            await _disposeWaitHandle.WaitAsync();
         }
 
-        private bool LoadDispatcher()
-        {
-            lock (this)
-            {
-                if (_disposed)
-                    return false;
-
-                if (_loopThread != null)
-                    return true;
-
-                _loopThread = new Thread(Looper);
-            }
-
-            _loopThread.Start();
-            return true;
-        }
-
-        private void Looper()
+        private async Task ProcessQueue()
         {
             while (true)
             {
-                lock (this)
+                while (_queuedTasks.TryDequeue(out var task))
                 {
-                    if (_disposed)
-                        return;
+                    try
+                    {
+                        await task();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception while dispatching a task");
+                    }
                 }
 
-                _waitHandle.WaitOne();
-                ProcessQueue();
+                // New tasks are only queued when the mutex is locked.
+                // By locking the mutex and checking if it is empty,
+                // even if a new task is being queued, a new process queue
+                // will begin after the new task is queued.
+                // TLDR: No tasks will end up being unprocessed
+                using (await _mutex.LockAsync())
+                {
+                    if (!_queuedTasks.IsEmpty) continue;
+
+                    _processingQueue = false;
+                    _disposeWaitHandle?.Set();
+
+                    break;
+                }
             }
         }
 
-        private void ProcessQueue()
+        private async Task EnsureQueueProcessing(Func<Task> task)
         {
-            while (_queueActions.TryDequeue(out var action))
-                //Try catch prevents exception in case of direct insert on ConcurrentQueue instead of Enqueue it
-                try
-                {
-                    action.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Exception while dispatching a task");
-                }
-        }
+            using (await _mutex.LockAsync())
+            {
+                _queuedTasks.Enqueue(task);
 
-        #region Enqueue
+                if (_processingQueue) return;
+
+                _processingQueue = true;
+
+                Task.Run(ProcessQueue);
+            }
+        }
 
         public Task Enqueue(Action action, Action<Exception>? exceptionHandler = null)
         {
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
-
-            if (!LoadDispatcher())
-                throw new ObjectDisposedException(nameof(ActionDispatcher));
-
-            var tcs = new TaskCompletionSource<Task>();
-            _queueActions.Enqueue(() =>
+            return Enqueue(() =>
             {
-                try
-                {
-                    action();
-                    tcs.SetResult(Task.CompletedTask);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
+                action();
 
-                    if (exceptionHandler != null)
-                        exceptionHandler(ex);
-                    else
-                        _logger.LogError(ex, "Exception while dispatching a task");
-                }
-            });
-            _waitHandle.Set();
-            return tcs.Task;
+                return Task.CompletedTask;
+            }, exceptionHandler);
         }
 
-        public async Task Enqueue(Func<Task> task, Action<Exception>? exceptionHandler = null)
+        public Task Enqueue(Func<Task> task, Action<Exception>? exceptionHandler = null)
         {
-            if (task == null)
-                throw new ArgumentNullException(nameof(task));
-
-            if (!LoadDispatcher())
-                throw new ObjectDisposedException(nameof(ActionDispatcher));
-
-            var tcs = new TaskCompletionSource<bool>();
-            _queueActions.Enqueue(() =>
+            return Enqueue(async () =>
             {
-                try
-                {
-                    AsyncHelper.RunSync(task);
+                await task();
 
-                    tcs.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-
-                    if (exceptionHandler != null)
-                        exceptionHandler(ex);
-                    else
-                        _logger.LogError(ex, "Exception while dispatching a task");
-                }
-            });
-            _waitHandle.Set();
-            await tcs.Task;
+                return false;
+            }, exceptionHandler);
         }
 
         public Task<T> Enqueue<T>(Func<T> action, Action<Exception>? exceptionHandler = null)
         {
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
-
-            if (!LoadDispatcher())
-                throw new ObjectDisposedException(nameof(ActionDispatcher));
-
-            var tcs = new TaskCompletionSource<T>();
-            _queueActions.Enqueue(() =>
+            return Enqueue(() =>
             {
-                try
-                {
-                    tcs.SetResult(action());
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
+                var result = action();
 
-                    if (exceptionHandler != null)
-                        exceptionHandler(ex);
-                    else
-                        _logger.LogError(ex, "Exception while dispatching a task");
-                }
-            });
-            _waitHandle.Set();
-            return tcs.Task;
+                return Task.FromResult(result);
+            }, exceptionHandler);
         }
 
         public async Task<T> Enqueue<T>(Func<Task<T>> task, Action<Exception>? exceptionHandler = null)
         {
-            if (task is null)
-                throw new ArgumentNullException(nameof(task));
-
-            if (!LoadDispatcher())
-                throw new ObjectDisposedException(nameof(ActionDispatcher));
-
             var tcs = new TaskCompletionSource<T>();
-            _queueActions.Enqueue(() =>
+
+            await EnsureQueueProcessing(async () =>
             {
                 try
                 {
-                    var result = AsyncHelper.RunSync(task);
+                    var result = await task();
 
                     tcs.SetResult(result);
                 }
@@ -207,16 +141,18 @@ namespace SilK.Unturned.Extras.Dispatcher
                 {
                     tcs.SetException(ex);
 
-                    if (exceptionHandler is not null)
-                        exceptionHandler(ex);
-                    else
+                    if (exceptionHandler == null)
+                    {
                         _logger.LogError(ex, "Exception while dispatching a task");
+                    }
+                    else
+                    {
+                        exceptionHandler(ex);
+                    }
                 }
             });
-            _waitHandle.Set();
+
             return await tcs.Task;
         }
-
-        #endregion
     }
 }

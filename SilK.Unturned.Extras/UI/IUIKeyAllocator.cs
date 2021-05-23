@@ -4,7 +4,7 @@ using System;
 namespace SilK.Unturned.Extras.UI
 {
     /// <summary>
-    /// A service which allocates ui effect keys to help prevent key overlapping.
+    /// A service which allocates UI effect keys to help prevent key overlapping.
     /// </summary>
     [Obsolete("Use OpenMod.Unturned.Effects.IUnturnedUIEffectsKeysProvider instead. This will be removed in v2.0.")]
     [Service]

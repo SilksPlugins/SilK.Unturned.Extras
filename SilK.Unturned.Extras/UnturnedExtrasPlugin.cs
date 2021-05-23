@@ -7,8 +7,14 @@ using System;
 
 namespace SilK.Unturned.Extras
 {
+    /// <summary>
+    /// The central plugin which manages SilK.Unturned.Extras services.
+    /// </summary>
     public class UnturnedExtrasPlugin : OpenModUnturnedPlugin
     {
+        /// <summary>
+        /// Creates an instance of this plugin. Should not be called except by OpenMod.
+        /// </summary>
         public UnturnedExtrasPlugin(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
