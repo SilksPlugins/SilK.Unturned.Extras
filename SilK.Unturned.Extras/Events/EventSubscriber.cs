@@ -59,15 +59,22 @@ namespace SilK.Unturned.Extras.Events
 
                 var disposable = _eventBus.Subscribe(component, eventType, async (_, sender, @event) =>
                 {
-                    var task = (UniTask) method.Invoke(target, new[] {sender, @event});
+                    UniTask GetTask() => (UniTask) method.Invoke(target, new[] {sender, @event});
 
                     if (typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
                     {
-                        task.Forget();
+                        async UniTask RunAsync()
+                        {
+                            await UniTask.SwitchToThreadPool();
+
+                            await GetTask();
+                        }
+
+                        RunAsync().Forget();
                     }
                     else
                     {
-                        await task.AsTask();
+                        await GetTask().AsTask();
                     }
                 });
 
