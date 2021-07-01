@@ -22,7 +22,7 @@ namespace SilK.Unturned.Extras.UI
 {
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     internal class UIManager : IUIManager, IAsyncDisposable,
-        IInstanceEventListener<UnturnedUserDisconnectedEvent>,
+        IInstanceAsyncEventListener<UnturnedUserDisconnectedEvent>,
         IInstanceAsyncEventListener<UnturnedPlayerDeathEvent>,
         IInstanceAsyncEventListener<UnturnedShutdownCommencedEvent>
     {
