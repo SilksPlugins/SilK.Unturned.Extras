@@ -333,7 +333,7 @@ namespace SilK.Unturned.Extras.UI
                 }
             }
 
-            ArenaClearTask().Forget();
+            UniTask.RunOnThreadPool(ArenaClearTask).Forget();
         }
 
         private delegate void ArenaClear();

@@ -317,7 +317,7 @@ namespace SilK.Unturned.Extras.UI
                 await ButtonClickedAsync(@event.ButtonName);
             }
 
-            HandleEvent().Forget();
+            UniTask.RunOnThreadPool(HandleEvent, cancellationToken: CancellationToken).Forget();
 
             return Task.CompletedTask;
         }
@@ -359,7 +359,7 @@ namespace SilK.Unturned.Extras.UI
                 await TextInputtedAsync(@event.TextInputName, @event.Text);
             }
 
-            HandleEvent().Forget();
+            UniTask.RunOnThreadPool(HandleEvent, cancellationToken: CancellationToken).Forget();
 
             return Task.CompletedTask;
         }

@@ -63,14 +63,7 @@ namespace SilK.Unturned.Extras.Events
 
                     if (typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
                     {
-                        async UniTask RunAsync()
-                        {
-                            await UniTask.SwitchToThreadPool();
-
-                            await GetTask();
-                        }
-
-                        RunAsync().Forget();
+                        UniTask.RunOnThreadPool(GetTask).Forget();
                     }
                     else
                     {
