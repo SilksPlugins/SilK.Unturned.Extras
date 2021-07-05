@@ -1,18 +1,41 @@
-﻿using OpenMod.Unturned.Users;
+﻿using OpenMod.Unturned.Effects;
+using OpenMod.Unturned.Users;
 using System;
 
 namespace SilK.Unturned.Extras.UI
 {
+    /// <summary>
+    /// An implementation of <see cref="UISessionBase"/> which
+    /// provides wrapper methods to support a UI with only one effect.
+    /// </summary>
     public abstract class SingleEffectUISession : UISessionBase
     {
+        /// <summary>
+        /// The single effect ID to be used by wrapper methods.
+        /// </summary>
         public abstract ushort EffectId { get; }
 
-        private short? _effectKey;
-        protected short EffectKey => _effectKey ??= KeyAllocator.GetEffectKey(EffectId);
+        private UnturnedUIEffectKey? _effectKey;
+
+        /// <summary>
+        /// The effect key used alongside the provided <see cref="EffectId"/>.
+        /// </summary>
+        protected short EffectKey => (_effectKey ??= KeysProvider.BindKey(OpenModComponent)).Value;
 
         protected SingleEffectUISession(UnturnedUser user, IServiceProvider serviceProvider)
             : base(user, serviceProvider)
         {
+            Dispose += OnDispose;
+        }
+
+        private void OnDispose()
+        {
+            Dispose -= OnDispose;
+
+            if (_effectKey != null)
+            {
+                KeysProvider.ReleaseKey(OpenModComponent, _effectKey.Value);
+            }
         }
 
         protected void SendUIEffect() =>

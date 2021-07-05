@@ -3,7 +3,7 @@
 namespace SilK.Unturned.Extras.Steam
 {
     [XmlRoot(ElementName = "profile")]
-    internal class SteamProfile : ISteamProfile
+    public class SteamProfile : ISteamProfile
     {
         [XmlElement(ElementName = "steamID64")]
         public ulong SteamId { get; set; }

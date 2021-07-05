@@ -116,7 +116,7 @@ namespace SilK.Unturned.Extras.Movement
 
             var jump = GetTotalPluginMultiplier(player, x => x.Jump);
 
-            player.movement.sendPluginGravityMultiplier(jump);
+            player.movement.sendPluginJumpMultiplier(jump);
         }
 
         public async UniTask SetSpeedMultiplier(Player player, string id, float speedMultiplier)
@@ -129,7 +129,7 @@ namespace SilK.Unturned.Extras.Movement
 
             var speed = GetTotalPluginMultiplier(player, x => x.Speed);
 
-            player.movement.sendPluginGravityMultiplier(speed);
+            player.movement.sendPluginSpeedMultiplier(speed);
         }
     }
 }

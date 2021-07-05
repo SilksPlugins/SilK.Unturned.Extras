@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace SilK.Unturned.Extras.UI
 {
+    /// <summary>
+    /// A service which manages players' UI sessions.
+    /// </summary>
     [Service]
     public interface IUIManager
     {
@@ -16,7 +19,10 @@ namespace SilK.Unturned.Extras.UI
         /// <typeparam name="TSession">The UI session type.</typeparam>
         /// <param name="user">The user co-related with the session.</param>
         /// <param name="options">The options for extra session functionality.</param>
-        /// <param name="lifetimeScope">The scope for controlling service resolution and disposal of the session.</param>
+        /// <param name="lifetimeScope">
+        /// The scope for controlling service resolution and disposal of the session.
+        /// Using the scope of a command or event listener will cause the session to dispose after execution.
+        /// </param>
         /// <returns>The new UI session.</returns>
         UniTask<TSession> StartSession<TSession>(UnturnedUser user, UISessionOptions? options = null,
             ILifetimeScope? lifetimeScope = null) where TSession : class, IUISession;
@@ -57,7 +63,10 @@ namespace SilK.Unturned.Extras.UI
         /// <typeparam name="TSession">The UI session type.</typeparam>
         /// <param name="user">The user co-related with the session.</param>
         /// <param name="options">The options for extra session functionality.</param>
-        /// <param name="lifetimeScope">The scope for controlling service resolution and disposal of the session.</param>
+        /// <param name="lifetimeScope">
+        /// The scope for controlling service resolution and disposal of the session.
+        /// Using the scope of a command or event listener will cause the session to dispose after execution.
+        /// </param>
         /// <returns>The retrieved/created UI session.</returns>
         UniTask<TSession> GetOrStartSession<TSession>(UnturnedUser user, UISessionOptions? options = null,
             ILifetimeScope? lifetimeScope = null) where TSession : class, IUISession;

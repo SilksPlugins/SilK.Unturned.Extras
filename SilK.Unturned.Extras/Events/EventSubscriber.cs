@@ -6,7 +6,6 @@ using OpenMod.API;
 using OpenMod.API.Eventing;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
-using OpenMod.Common.Helpers;
 using OpenMod.Core.Helpers;
 using OpenMod.Core.Ioc;
 using System;
@@ -60,15 +59,15 @@ namespace SilK.Unturned.Extras.Events
 
                 var disposable = _eventBus.Subscribe(component, eventType, async (_, sender, @event) =>
                 {
-                    var task = (UniTask) method.Invoke(target, new[] {sender, @event});
+                    UniTask GetTask() => (UniTask) method.Invoke(target, new[] {sender, @event});
 
                     if (typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
                     {
-                        task.Forget();
+                        UniTask.RunOnThreadPool(GetTask).Forget();
                     }
                     else
                     {
-                        await task.AsTask();
+                        await GetTask().AsTask();
                     }
                 });
 
@@ -78,83 +77,16 @@ namespace SilK.Unturned.Extras.Events
             return new DisposeAction(disposables.DisposeAll);
         }
 
-        // todo: Use ServiceRegistrationHelper.FindFromAssembly in next patch
-        public static IEnumerable<ServiceRegistration> FindFromAssembly<T>(Assembly assembly, ILogger? logger = null) where T : ServiceImplementationAttribute
-        {
-            List<Type> types;
-            try
-            {
-                types = AssemblyExtensions.GetLoadableTypes(assembly)
-                    .Where(d => d.IsClass && !d.IsInterface && !d.IsAbstract)
-                    .ToList();
-            }
-            catch (ReflectionTypeLoadException ex) //this ignores missing optional dependencies
-            {
-                logger?.LogTrace(ex, $"Some optional dependencies are missing for \"{assembly}\"");
-                if (ex.LoaderExceptions != null && ex.LoaderExceptions.Length > 0)
-                {
-                    foreach (var loaderException in ex.LoaderExceptions)
-                    {
-                        logger?.LogTrace(loaderException, "Loader Exception: ");
-                    }
-                }
-
-
-                types = ex.Types.Where(tp => tp != null && tp.IsClass && !tp.IsInterface && !tp.IsAbstract)
-                    .ToList();
-            }
-
-            foreach (var type in types)
-            {
-                T? attribute;
-                Type[] interfaces;
-
-                try
-                {
-                    attribute = (T?)type.GetCustomAttributes(inherit: false).FirstOrDefault(x => x.GetType() == typeof(T));
-                    if (attribute == null)
-                    {
-                        continue;
-                    }
-
-                    interfaces = type.GetInterfaces()
-                        .Where(d => d.GetCustomAttribute<ServiceAttribute>() != null)
-                        .ToArray();
-
-                    if (interfaces.Length == 0)
-                    {
-                        logger?.LogWarning(
-                            $"Type {type.FullName} in assembly {assembly.FullName} has been marked as ServiceImplementation but does not inherit any services!\nDid you forget to add [Service] to your interfaces?");
-                        continue;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    logger?.LogWarning($"FindFromAssembly has failed for type: {type.FullName} while searching for {typeof(T).FullName}", ex);
-                    continue;
-                }
-
-                yield return new ServiceRegistration
-                {
-                    Priority = attribute.Priority,
-                    ServiceImplementationType = type,
-                    ServiceTypes = interfaces,
-                    Lifetime = attribute.Lifetime
-                };
-            }
-        }
-
         public IDisposable SubscribeServices(Assembly assembly, IOpenModComponent component)
         {
             var disposables = new List<IDisposable>();
 
             var registrations =
-                FindFromAssembly<ServiceImplementationAttribute>(assembly)
+                ServiceRegistrationHelper.FindFromAssembly<ServiceImplementationAttribute>(assembly)
                     .Where(x => x.Lifetime == ServiceLifetime.Singleton).ToList();
 
             var pluginRegistrations =
-                FindFromAssembly<PluginServiceImplementationAttribute>(assembly)
+                ServiceRegistrationHelper.FindFromAssembly<PluginServiceImplementationAttribute>(assembly)
                     .Where(x => x.Lifetime == ServiceLifetime.Singleton).ToList();
 
             foreach (var registration in registrations.Concat(pluginRegistrations))
