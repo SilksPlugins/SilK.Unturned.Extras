@@ -32,6 +32,6 @@ jobs:
              --skip-duplicate
     - name: Push to GitHub
       run: dotnet nuget push SilK.Unturned.Extras/bin/Release/*.nupkg
-             --api-key ${{ secrets.DEPLOY_KEY }}
-             --source https://nuget.pkg.github.com/iamsilk/index.json
+             --api-key ${{ secrets.GITHUB_TOKEN }}
+             --source https://nuget.pkg.github.com/silksplugins/index.json
              --skip-duplicate
