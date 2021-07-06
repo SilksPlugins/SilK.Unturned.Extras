@@ -22,7 +22,7 @@
 
 	<PropertyGroup>
 		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/IAmSilK/SilK.Unturned.Extras</RepositoryUrl>
+		<RepositoryUrl>https://github.com/SilKsPlugins/SilK.Unturned.Extras</RepositoryUrl>
 	</PropertyGroup>
 
 	<PropertyGroup>
