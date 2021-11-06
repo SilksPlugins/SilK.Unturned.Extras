@@ -8,7 +8,7 @@ namespace SilK.Unturned.Extras.Configuration
     /// A service used to access the configuration of a plugin from outside the plugin scope.
     /// </summary>
     /// <typeparam name="TPlugin">The plugin of the target configuration.</typeparam>
-    public interface IConfigurationAccessor<out TPlugin> where TPlugin : IOpenModPlugin
+    public interface IConfigurationAccessor<out TPlugin> : IConfiguration where TPlugin : IOpenModPlugin
     {
         /// <summary>
         /// Gets the configuration instance.

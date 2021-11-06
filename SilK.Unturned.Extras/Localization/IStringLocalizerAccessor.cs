@@ -8,7 +8,7 @@ namespace SilK.Unturned.Extras.Localization
     /// A service used to access the string localizer of a plugin from outside the plugin scope.
     /// </summary>
     /// <typeparam name="TPlugin">The plugin of the target string localizer.</typeparam>
-    public interface IStringLocalizerAccessor<out TPlugin> where TPlugin : IOpenModPlugin
+    public interface IStringLocalizerAccessor<out TPlugin> : IStringLocalizer where TPlugin : IOpenModPlugin
     {
         /// <summary>
         /// Gets the string localizer instance.
