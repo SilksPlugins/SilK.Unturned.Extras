@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using OpenMod.API.Plugins;
 using SilK.Unturned.Extras.Accessors;
+using System;
 using System.Collections.Generic;
 
 namespace SilK.Unturned.Extras.Configuration
@@ -10,7 +11,7 @@ namespace SilK.Unturned.Extras.Configuration
         PluginServiceAccessor<TPlugin, IConfiguration>,
         IConfigurationAccessor<TPlugin> where TPlugin : IOpenModPlugin
     {
-        public ConfigurationAccessor(IPluginAccessor<TPlugin> pluginAccessor) : base(pluginAccessor)
+        public ConfigurationAccessor(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 

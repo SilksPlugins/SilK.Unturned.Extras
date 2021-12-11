@@ -11,7 +11,7 @@ namespace SilK.Unturned.Extras.Localization
         PluginServiceAccessor<TPlugin, IStringLocalizer>,
         IStringLocalizerAccessor<TPlugin> where TPlugin : IOpenModPlugin
     {
-        public StringLocalizerAccessor(IPluginAccessor<TPlugin> pluginAccessor) : base(pluginAccessor)
+        public StringLocalizerAccessor(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
