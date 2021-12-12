@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
-		<PackageReference Include="OpenMod.Unturned" Version="3.0.28" />
+		<PackageReference Include="OpenMod.Unturned" Version="3.2.7" />
 		<PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
 			<PrivateAssets>All</PrivateAssets>
 		</PackageReference>
