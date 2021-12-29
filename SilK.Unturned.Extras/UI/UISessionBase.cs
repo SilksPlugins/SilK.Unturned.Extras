@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenMod.API;
 using OpenMod.API.Eventing;
 using OpenMod.Core.Helpers;
@@ -68,6 +69,11 @@ namespace SilK.Unturned.Extras.UI
         /// </summary>
         protected readonly IOpenModComponent OpenModComponent;
 
+        /// <summary>
+        /// The <see cref="ILogger"/> with a generic type of the UI session's type resolved by the provided lifetime scope.
+        /// </summary>
+        protected readonly ILogger Logger;
+
         private readonly List<(object, ButtonClickedCallback)> _buttonClickedCallbacks;
         private readonly List<(object, TextInputtedCallback)> _textInputtedCallbacks;
 
@@ -92,6 +98,9 @@ namespace SilK.Unturned.Extras.UI
             KeyAllocator = serviceProvider.GetRequiredService<IUIKeyAllocator>();
             KeysProvider = serviceProvider.GetRequiredService<IUnturnedUIEffectsKeysProvider>();
             OpenModComponent = serviceProvider.GetRequiredService<IOpenModComponent>();
+
+            var loggerType = typeof(ILogger<>).MakeGenericType(GetType());
+            Logger = (ILogger)serviceProvider.GetRequiredService(loggerType);
 
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -151,11 +160,18 @@ namespace SilK.Unturned.Extras.UI
             if (_isDisposed) return;
             _isDisposed = true;
 
-            await EndAsync();
+            try
+            {
+                await EndAsync();
 
-            await OnDisposeAsync();
+                await OnDisposeAsync();
 
-            Dispose?.Invoke();
+                Dispose?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred when disposing UI session");
+            }
         }
 
         protected virtual UniTask OnDisposeAsync() => UniTask.CompletedTask;
