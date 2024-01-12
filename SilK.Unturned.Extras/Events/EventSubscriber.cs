@@ -18,20 +18,15 @@ namespace SilK.Unturned.Extras.Events
     [ServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
     internal class EventSubscriber : IEventSubscriber
     {
-        private readonly IRuntime _runtime;
         private readonly ILogger<EventSubscriber> _logger;
         private readonly IEventBus _eventBus;
-        private readonly IServiceProvider _serviceProvider;
 
         public EventSubscriber(
             ILogger<EventSubscriber> logger,
-            IEventBus eventBus,
-            IServiceProvider serviceProvider, IRuntime runtime)
+            IEventBus eventBus)
         {
             _logger = logger;
             _eventBus = eventBus;
-            _serviceProvider = serviceProvider;
-            _runtime = runtime;
         }
 
         private IEnumerable<Type> GetEventListenerTypes(Type type) => type.GetInterfaces().Where(x =>
@@ -47,7 +42,6 @@ namespace SilK.Unturned.Extras.Events
             foreach (var listener in eventListeners)
             {
                 var eventType = listener.GetGenericArguments().Single();
-
                 var method = listener.GetMethod("HandleEventAsync", BindingFlags.Public | BindingFlags.Instance);
 
                 if (method == null)
@@ -59,7 +53,7 @@ namespace SilK.Unturned.Extras.Events
 
                 var disposable = _eventBus.Subscribe(component, eventType, async (_, sender, @event) =>
                 {
-                    UniTask GetTask() => (UniTask) method.Invoke(target, new[] {sender, @event});
+                    UniTask GetTask() => (UniTask)method.Invoke(target, new[] { sender, @event });
 
                     if (typeof(IInstanceAsyncEventListener<>).IsAssignableFrom(listener.GetGenericTypeDefinition()))
                     {
@@ -85,11 +79,7 @@ namespace SilK.Unturned.Extras.Events
                 ServiceRegistrationHelper.FindFromAssembly<ServiceImplementationAttribute>(assembly)
                     .Where(x => x.Lifetime == ServiceLifetime.Singleton).ToList();
 
-            var pluginRegistrations =
-                ServiceRegistrationHelper.FindFromAssembly<PluginServiceImplementationAttribute>(assembly)
-                    .Where(x => x.Lifetime == ServiceLifetime.Singleton).ToList();
-
-            foreach (var registration in registrations.Concat(pluginRegistrations))
+            foreach (var registration in registrations)
             {
                 if (!GetEventListenerTypes(registration.ServiceImplementationType).Any()) continue;
 
