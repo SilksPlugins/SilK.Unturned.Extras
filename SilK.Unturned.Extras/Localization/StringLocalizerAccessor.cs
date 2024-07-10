@@ -24,9 +24,9 @@ namespace SilK.Unturned.Extras.Localization
         /// <inheritdoc cref="IStringLocalizer"/>
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) =>
             GetInstance().GetAllStrings(includeParentCultures);
-        
+
         /// <inheritdoc cref="IStringLocalizer"/>
         [Obsolete("This method is obsolete. Use `CurrentCulture` and `CurrentUICulture` instead.")]
-        public IStringLocalizer WithCulture(CultureInfo culture) => GetInstance().WithCulture(culture);
+        public IStringLocalizer WithCulture(CultureInfo culture) => GetInstance(); //.WithCulture(culture); No longer available
     }
 }

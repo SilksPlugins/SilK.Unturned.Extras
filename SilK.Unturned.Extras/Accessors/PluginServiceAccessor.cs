@@ -29,7 +29,7 @@ namespace SilK.Unturned.Extras.Accessors
             var eventBus = serviceProvider.GetService<IEventBus>();
             var runtime = serviceProvider.GetService<IRuntime>();
 
-            _eventsDisposable = eventBus.Subscribe<PluginLoadedEvent>(runtime, OnPluginLoaded);
+            _eventsDisposable = eventBus!.Subscribe<PluginLoadedEvent>(runtime!, OnPluginLoaded);
         }
 
         public void Dispose()

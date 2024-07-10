@@ -27,8 +27,10 @@ namespace SilK.Unturned.Extras.Configuration
         /// <inheritdoc cref="IConfiguration"/>
         public string this[string key]
         {
-            get => GetInstance()[key];
-            set => GetInstance()[key] = value;
+            get => GetInstance()[key]!;
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+            set => GetInstance()[key!] = value;
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         }
     }
 }
